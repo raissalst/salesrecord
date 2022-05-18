@@ -19,19 +19,13 @@ class CreateSalesView(APIView):
         serializer.is_valid(raise_exception=True)
 
         #normalizar os dados (título, tirar caracteres especiais com regex -> cuidado com ç e ~)
-        #colocar pra estourar erro quando não enviar o file com arquivo
-
         if len(serializer.validated_data) == 0:
             raise EmptyFileError()
 
         sales = Sale.objects.bulk_create([Sale(**data) for data in serializer.validated_data])
 
         serializer = SaleSerializer(sales, many=True)
-
-        total_gross_income = 0
-        
-        #comprehension
-        for item in serializer.data:
-            total_gross_income += (item.get('unit_price') * item.get('quantity'))
+                
+        total_gross_income = sum([item.get('unit_price') * item.get('quantity') for item in serializer.data])
             
         return Response({"sales_data": serializer.data, "total gross income": f'R${total_gross_income}'}, status.HTTP_201_CREATED)
