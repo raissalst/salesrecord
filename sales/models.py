@@ -11,4 +11,3 @@ class Sale(models.Model):
     quantity = models.PositiveIntegerField()
     address = models.TextField()
     provider = models.TextField()
-
