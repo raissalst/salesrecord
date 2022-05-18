@@ -1,6 +1,8 @@
 import csv
 import io
 
+from sales.exceptions import RequestFileNameError
+
 from .forms import UploadFileForm
 
 
@@ -9,9 +11,10 @@ def uploaded_file_data(request):
 
     if form.is_valid():
         return handle_uploaded_file(request.FILES["file"])
+    elif request.FILES.get("file") == None:
+        raise RequestFileNameError()
     else:
         return []
-
 
 def handle_uploaded_file(file):
     columns = ["buyer", "description", "unit_price", "quantity", "address", "provider"]
