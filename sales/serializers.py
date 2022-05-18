@@ -11,3 +11,12 @@ class SaleSerializer(serializers.Serializer):
     quantity = serializers.IntegerField()
     address = serializers.CharField()
     provider = serializers.CharField()
+
+    def validate(self, attrs):
+        attrs["buyer"] = attrs["buyer"].title()
+        attrs["address"] = attrs["buyer"].title()
+        attrs["provider"] = attrs["provider"].title()
+
+        return super().validate(attrs)
+
+

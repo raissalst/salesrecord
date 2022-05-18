@@ -15,16 +15,17 @@ class CreateSalesView(APIView):
         data_to_buckle_received = uploaded_file_data(request)
 
         serializer = SaleSerializer(data=data_to_buckle_received, many=True)
-
         serializer.is_valid(raise_exception=True)
 
-        #normalizar os dados (título, tirar caracteres especiais com regex -> cuidado com ç e ~)
         if len(serializer.validated_data) == 0:
             raise EmptyFileError()
 
         sales = Sale.objects.bulk_create([Sale(**data) for data in serializer.validated_data])
 
         serializer = SaleSerializer(sales, many=True)
+
+        # for item in serializer.data:
+        #     item["buyer"] = item["buyer"].title()
                 
         total_gross_income = sum([item.get('unit_price') * item.get('quantity') for item in serializer.data])
             
