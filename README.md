@@ -14,6 +14,3 @@ To run the application using docker-compose, follow the next steps:
 To run the tests, a variable named TEST should be set in CLT (tests are supposed to run in SQLite database).
 Run in CLT the following to run the tests:
 TEST=test python manage.py test
-
-To produce a report with test results, run in CLT:
-TEST=test python manage.py test -v 2 &> report.txt
