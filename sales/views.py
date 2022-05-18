@@ -25,9 +25,6 @@ class CreateSalesView(APIView):
 
         serializer = SaleSerializer(sales, many=True)
 
-        # for item in serializer.data:
-        #     item["buyer"] = item["buyer"].title()
-
         total_gross_income = sum(
             [item.get("unit_price") * item.get("quantity") for item in serializer.data]
         )
