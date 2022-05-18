@@ -2,6 +2,10 @@ from django.test import TestCase
 
 from sales.models import Sale
 
+from rest_framework.test import APITestCase
+from io import StringIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+
 class SaleModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -26,3 +30,23 @@ class SaleModelTest(TestCase):
         self.assertEqual(self.new_sale.address, self.address)
 
         self.assertEqual(self.new_sale.provider, self.provider)
+
+
+class MyTestCase(APITestCase):
+    @classmethod
+    def setUp(cls):
+        io = StringIO('Comprador\tDescrição\tPreço Unitário\tQuantidade\tEndereço\tFornecedor\nJoão Silva\tR$10 of R$20 of food\t10.0\t2\t987 Fake St\tBobs')
+        io.write('foo')
+    
+        text_file = InMemoryUploadedFile(io, None, 'foo.txt', 'text', io.line_buffering, charset='utf-8')
+        text_file.seek(0)
+        return text_file
+
+    def test_upload_text_file(self):
+        test_file = self.setUp()            
+
+        response = self.client.post("/api/upload/", {
+                "file": test_file,
+            },
+            format='multipart')
+        self.assertEqual(response.status_code, 201)
