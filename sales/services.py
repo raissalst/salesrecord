@@ -16,6 +16,7 @@ def uploaded_file_data(request):
     else:
         return []
 
+
 def handle_uploaded_file(file):
     columns = ["buyer", "description", "unit_price", "quantity", "address", "provider"]
 

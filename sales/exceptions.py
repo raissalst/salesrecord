@@ -3,7 +3,8 @@ from rest_framework.exceptions import APIException
 
 class RequestFileNameError(APIException):
     status_code = 409
-    default_detail = {'message': 'File name should be equal to file'}
+    default_detail = {"message": "File name should be equal to file"}
+
 
 class EmptyFileError(APIException):
     status_code = 404
