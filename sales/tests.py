@@ -34,19 +34,57 @@ class SaleModelTest(TestCase):
 
 class MyTestCase(APITestCase):
     @classmethod
-    def setUp(cls):
+    def setUpTextFile(cls):
         io = StringIO('Comprador\tDescrição\tPreço Unitário\tQuantidade\tEndereço\tFornecedor\nJoão Silva\tR$10 of R$20 of food\t10.0\t2\t987 Fake St\tBobs')
         io.write('foo')
     
         text_file = InMemoryUploadedFile(io, None, 'foo.txt', 'text', io.line_buffering, charset='utf-8')
         text_file.seek(0)
         return text_file
+    
+    def setEmptyFile(cls):
+        io = StringIO()
+        io.write('empty')
+
+        text_file = InMemoryUploadedFile(io, None, 'empty.txt', 'text', io.line_buffering, charset='utf-8')
+        text_file.seek(0)
+        return text_file
 
     def test_upload_text_file(self):
-        test_file = self.setUp()            
+        test_file = self.setUpTextFile()            
 
         response = self.client.post("/api/upload/", {
                 "file": test_file,
             },
             format='multipart')
         self.assertEqual(response.status_code, 201)
+
+    def test_upload_text_file_with_wrong_name_field_in_request(self):
+            test_file = self.setUpTextFile()            
+
+            response = self.client.post("/api/upload/", {
+                    "text": test_file,
+                },
+                format='multipart')
+            
+            output = response.json()
+
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(
+            output, {"message": "File name should be equal to file"}
+        )
+    
+    def test_upload_text_file_with_no_data(self):
+        test_file = self.setEmptyFile()            
+
+        response = self.client.post("/api/upload/", {
+                "file": test_file,
+            },
+            format='multipart')
+        
+        output = response.json()
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+        output, {"message": "No sales data to record (empty text file)"}
+    )
