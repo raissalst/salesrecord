@@ -6,7 +6,6 @@ from rest_framework.test import APITestCase
 
 from sales.models import Sale
 
-
 class SaleModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -63,6 +62,16 @@ class MyTestCase(APITestCase):
         )
         text_file.seek(0)
         return text_file
+    
+    def setNotAllowedExtensionTextFile(cls):
+        io = StringIO()
+        io.write("another")
+
+        text_file = InMemoryUploadedFile(
+            io, None, "another.rtf", "text", io.line_buffering, charset="utf-8"
+        )
+        text_file.seek(0)
+        return text_file
 
     def test_upload_text_file(self):
         test_file = self.setUpTextFile()
@@ -108,4 +117,22 @@ class MyTestCase(APITestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(
             output, {"message": "No sales data to record (empty text file)"}
+        )
+
+    def test_upload_file_with_extension_not_allowed(self):
+        test_file = self.setNotAllowedExtensionTextFile()
+
+        response = self.client.post(
+            "/api/upload/",
+            {
+                "file": test_file,
+            },
+            format="multipart",
+        )
+
+        output = response.json()
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            output, {"message": "Invalid file extension. Only accepts txt extension."}
         )

@@ -1,18 +1,21 @@
 import csv
 import io
 
-from sales.exceptions import RequestFileNameError
+from sales.exceptions import RequestFileNameError, UnsuportedFileExtensionError
 
 from .forms import UploadFileForm
 
 
 def uploaded_file_data(request):
     form = UploadFileForm(request.POST, request.FILES)
-
-    if form.is_valid():
-        return handle_uploaded_file(request.FILES["file"])
-    elif request.FILES.get("file") == None:
+    extensions_accepted = ['txt']
+    
+    if form.is_valid() and request.FILES['file'].name[-3:].lower() in extensions_accepted:
+        return handle_uploaded_file(request.FILES['file'])
+    elif request.FILES.get('file') == None:
         raise RequestFileNameError()
+    elif request.FILES['file'].name[-3:].lower() not in extensions_accepted:
+        raise UnsuportedFileExtensionError()
     else:
         return []
 

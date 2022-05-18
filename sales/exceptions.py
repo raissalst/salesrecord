@@ -9,3 +9,8 @@ class RequestFileNameError(APIException):
 class EmptyFileError(APIException):
     status_code = 404
     default_detail = {"message": "No sales data to record (empty text file)"}
+
+
+class UnsuportedFileExtensionError(APIException):
+    status_code = 400
+    default_detail = {"message": "Invalid file extension. Only accepts txt extension."}
